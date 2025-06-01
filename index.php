@@ -33,7 +33,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <ul class="navbar-nav">
           <li class="nav-item"><a class="nav-link" href="index.php">Beranda</a></li>
           <li class="nav-item"><a class="nav-link" href="menu.php">Menu</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Tentang Kami</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">Tentang Kami</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Kontak</a></li>
         </ul>
@@ -61,7 +61,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <span class="badge bg-dark">Special Offer</span>
           <h1>Selamat Datang di<br>Amorad Caffe</h1>
           <p>Amorad Caffe adalah destinasi kopi premium yang menghadirkan pengalaman kopi autentik.</p>
-          <a href="#menu" class="btn btn-brown">Lihat Menu Kami</a>
+          <a href="menu.php" class="btn btn-brown">Lihat Menu Kami</a>
         </div>
       </div>
       <div class="carousel-item" style="background: url('https://static.tripzilla.id/media/14530/conversions/Preview-Kedai-Kopi-Kekinian-Jakarta-w768.webp') no-repeat center/cover; height: 80vh;">
@@ -69,7 +69,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <span class="badge bg-dark">Special Offer</span>
           <h1>Diskon 20%<br>Pembelian Pertama</h1>
           <p>Kunjungi kami dan dapatkan diskon 20% untuk pembelian pertama Anda.</p>
-          <a href="#menu" class="btn btn-brown">Pesan Sekarang</a>
+          <a href="menu.php" class="btn btn-brown">Pesan Sekarang</a>
         </div>
       </div>
       <div class="carousel-item" style="background: url('https://pinterplan.com/wp-content/uploads/2021/10/Cafe-Coffee-Shop-1024x716.jpg') no-repeat center/cover; height: 80vh;">
@@ -77,7 +77,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <span class="badge bg-dark">Special Offer</span>
           <h1>Suasana Nyaman<br>Aroma Menggoda</h1>
           <p>Nikmati suasana cafe yang nyaman dengan aroma kopi yang menggoda.</p>
-          <a href="#menu" class="btn btn-brown">Kunjungi Kami</a>
+          <a href="menu.php" class="btn btn-brown">Kunjungi Kami</a>
         </div>
       </div>
     </div>
@@ -237,7 +237,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <h5 class="fw-bold">Menu Cepat</h5>
           <ul class="list-unstyled small">
             <li><a href="menu.php" class="text-white text-decoration-none">Menu</a></li>
-            <li><a href="#" class="text-white text-decoration-none">Tentang Kami</a></li>
+            <li><a href="about.html" class="text-white text-decoration-none">Tentang Kami</a></li>
             <li><a href="#" class="text-white text-decoration-none">Profile</a></li>
             <li><a href="#" class="text-white text-decoration-none">Karir</a></li>
           </ul>
