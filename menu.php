@@ -36,7 +36,7 @@ $cats = $pdo->query("SELECT DISTINCT category FROM products")->fetchAll(PDO::FET
         <ul class="navbar-nav">
           <li class="nav-item"><a class="nav-link" href="index.php">Beranda</a></li>
           <li class="nav-item"><a class="nav-link" href="menu.php">Menu</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Tentang Kami</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">Tentang Kami</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Kontak</a></li>
         </ul>
@@ -206,7 +206,7 @@ $cats = $pdo->query("SELECT DISTINCT category FROM products")->fetchAll(PDO::FET
           <h5 class="fw-bold">Menu Cepat</h5>
           <ul class="list-unstyled small">
             <li><a href="menu.php" class="text-white text-decoration-none">Menu</a></li>
-            <li><a href="#" class="text-white text-decoration-none">Tentang Kami</a></li>
+            <li><a href="about.html" class="text-white text-decoration-none">Tentang Kami</a></li>
             <li><a href="#" class="text-white text-decoration-none">Profile</a></li>
             <li><a href="#" class="text-white text-decoration-none">Karir</a></li>
           </ul>
