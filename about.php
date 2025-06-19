@@ -95,22 +95,22 @@ if (!isset($_SESSION['user_id'])) {
       <div class="team-member">
         <img src="wildan.jpeg" alt="Ghaisan Wildan Bathsya">
         <h5>Ghaisan Wildan Bathsya</h5>
-        <p>Owner</p>
+        <p>2317051054</p>
       </div>
       <div class="team-member">
-        <img src="img/team2.jpg" alt="Anggota 2">
+        <img src="dilvi.jpg" alt="Anggota 2">
         <h5>Dilvi Yola Ferlyanda</h5>
-        <p>Manager</p>
+        <p>2317051035</p>
       </div>
       <div class="team-member">
-        <img src="img/team3.jpg" alt="Anggota 3">
+        <img src="dwi.jpg" alt="Anggota 3">
         <h5> Dwi Andini</h5>
-        <p>Barista</p>
+        <p>2317051025</p>
       </div>
       <div class="team-member">
-        <img src="img/team4.jpg" alt="Anggota 4">
-        <h5>Citra</h5>
-        <p>Chef</p>
+        <img src="citra.jpg" alt="Anggota 4">
+        <h5>Citra Fardiani</h5>
+        <p>2317051101</p>
       </div>
     </div>
   </section>
