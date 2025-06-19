@@ -1,56 +1,61 @@
+// menu.js
 document.addEventListener('DOMContentLoaded', () => {
-  // Elemen kontrol
-  const searchInput = document.getElementById('searchInput');
-  const categoryBtns = document.querySelectorAll('.category-btn');
-  const minInput = document.getElementById('minPrice');
-  const maxInput = document.getElementById('maxPrice');
-  const sortSelect = document.getElementById('sortSelect');
-  const grid = document.getElementById('productGrid');
+  // 1. STATE & ELEMEN UTAMA
+  const searchInput   = document.getElementById('searchInput');
+  const categoryBtns  = document.querySelectorAll('.category-btn');
+  const minInput      = document.getElementById('minPrice');
+  const maxInput      = document.getElementById('maxPrice');
+  const sortSelect    = document.getElementById('sortSelect');
+  const grid          = document.getElementById('productGrid');
+  const cardsCols     = grid
+    ? Array.from(grid.querySelectorAll('.product-card'))
+        .map(card => card.closest('.col-md-6, .col-lg-4'))
+    : [];
 
-  // Ambil semua elemen col yang berisi product-card agar render ulang tetap utuh (beserta modals)
-  const cards = Array.from(grid.querySelectorAll('.product-card')).map(card => card.closest('.col-md-6, .col-lg-4'));
+  // Offcanvas & Keranjang
+  const cartBadges   = document.querySelectorAll('.cart-badge');
+  const cartItems    = document.getElementById('cartItems');
+  const subtotalEl   = document.getElementById('subtotalText');
+  const taxEl        = document.getElementById('taxText');
+  const totalEl      = document.getElementById('totalText');
+  const cartFloatBtn = document.querySelector('.cart-float');
+  const offcanvasEl  = document.getElementById('cartOffcanvas');
 
-  // State
   let currentCategory = 'all';
-  let minPrice = 0;
-  let maxPrice = Infinity;
-  let sortBy = 'date_desc';
-  let searchQuery = '';
+  let minPrice        = 0;
+  let maxPrice        = Infinity;
+  let sortBy          = sortSelect?.value || 'date_desc';
+  let searchQuery     = '';
 
+  // Format angka ke Rupiah
+  const fmtRupiah = x => 'Rp ' + x.toLocaleString('id-ID');
+
+  // 2. FILTER & SORT
   function applyFilters() {
-    const filtered = cards.filter(col => {
-      const card = col.querySelector('.product-card');
-      const price = parseFloat(card.dataset.price) || 0;
-      const category = card.dataset.category || '';
-      const rating = parseFloat(card.dataset.rating) || 0;
-      const date = new Date(card.dataset.date);
-      const name = card.querySelector('.card-title').textContent.toLowerCase();
-
-      return (
-        price >= minPrice &&
-        price <= maxPrice &&
-        (currentCategory === 'all' || category === currentCategory) &&
-        name.includes(searchQuery)
-      );
+    if (!grid) return; // Jika grid tidak ada, lewati
+    let filtered = cardsCols.filter(col => {
+      const c        = col.querySelector('.product-card');
+      const price    = +c.dataset.price;
+      const category = c.dataset.category;
+      const name     = c.querySelector('.card-title').textContent.toLowerCase();
+      return price >= minPrice
+          && price <= maxPrice
+          && (currentCategory === 'all' || category === currentCategory)
+          && name.includes(searchQuery);
     });
 
     filtered.sort((a, b) => {
-      const cardA = a.querySelector('.product-card');
-      const cardB = b.querySelector('.product-card');
-      const priceA = parseFloat(cardA.dataset.price) || 0;
-      const priceB = parseFloat(cardB.dataset.price) || 0;
-      const ratingA = parseFloat(cardA.dataset.rating) || 0;
-      const ratingB = parseFloat(cardB.dataset.rating) || 0;
-      const dateA = new Date(cardA.dataset.date);
-      const dateB = new Date(cardB.dataset.date);
-
+      const A = a.querySelector('.product-card');
+      const B = b.querySelector('.product-card');
+      const pA = +A.dataset.price,  pB = +B.dataset.price;
+      const rA = +A.dataset.rating, rB = +B.dataset.rating;
+      const dA = new Date(A.dataset.date), dB = new Date(B.dataset.date);
       switch (sortBy) {
-        case 'price_asc':   return priceA - priceB;
-        case 'price_desc':  return priceB - priceA;
-        case 'rating_desc': return ratingB - ratingA;
-        case 'date_asc':    return dateA - dateB;
-        case 'date_desc':
-        default:            return dateB - dateA;
+        case 'price_asc':   return pA - pB;
+        case 'price_desc':  return pB - pA;
+        case 'rating_desc': return rB - rA;
+        case 'date_asc':    return dA - dB;
+        default:            return dB - dA;
       }
     });
 
@@ -59,42 +64,34 @@ document.addEventListener('DOMContentLoaded', () => {
     filtered.forEach(col => grid.appendChild(col));
   }
 
-  // Event: Pencarian
   if (searchInput) {
     searchInput.addEventListener('input', () => {
       searchQuery = searchInput.value.trim().toLowerCase();
       applyFilters();
     });
   }
-
-  // Event: Filter Kategori
   categoryBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       categoryBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      currentCategory = btn.dataset.cat || 'all';  // pastikan pakai data-cat di HTML
+      currentCategory = btn.dataset.cat || 'all';
       applyFilters();
     });
   });
-
-  // Event: Min & Max harga
   if (minInput) {
     minInput.addEventListener('input', () => {
-      const val = parseFloat(minInput.value);
-      minPrice = isNaN(val) ? 0 : val;
+      const v = parseFloat(minInput.value);
+      minPrice = isNaN(v) ? 0 : v;
       applyFilters();
     });
   }
-
   if (maxInput) {
     maxInput.addEventListener('input', () => {
-      const val = parseFloat(maxInput.value);
-      maxPrice = isNaN(val) ? Infinity : val;
+      const v = parseFloat(maxInput.value);
+      maxPrice = isNaN(v) ? Infinity : v;
       applyFilters();
     });
   }
-
-  // Event: Sorting
   if (sortSelect) {
     sortSelect.addEventListener('change', () => {
       sortBy = sortSelect.value;
@@ -102,27 +99,193 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Event: Qty Controls
-  document.querySelectorAll('.qty-group').forEach(group => {
-    const minus = group.querySelector('.btn-minus');
-    const plus  = group.querySelector('.btn-plus');
-    const input = group.querySelector('.qty-input');
+  // 3. AMBIL & RENDER KERANJANG DARI SERVER
+  function loadCartFromServer() {
+    fetch('get_cart.php')
+      .then(res => res.json())
+      .then(json => {
+        if (json.status === 'success') {
+          const items = json.items;
+          renderCartItems(items);
+          updateBadges(items);
+          syncGridQtyInputs(items);
+        }
+      })
+      .catch(err => console.error('Error loadCart:', err));
+  }
 
-    [minus, plus].forEach(btn =>
-      btn.addEventListener('click', e => e.stopPropagation())
-    );
+  function renderCartItems(items) {
+    if (!cartItems) return;
+    cartItems.innerHTML = '';
+    let subtotal = 0, totalQty = 0;
 
-    plus.addEventListener('click', () => {
-      input.value = (parseInt(input.value) || 0) + 1;
+    items.forEach(item => {
+      subtotal += parseFloat(item.total_price);
+      totalQty += parseInt(item.quantity);
+
+      const div = document.createElement('div');
+      div.className = 'd-flex align-items-center mb-3';
+      div.innerHTML = `
+        <img
+          src="${item.image_url}"
+          class="rounded me-2"
+          style="width:60px; height:60px; object-fit:cover;"
+          alt="${item.product_name}"
+        />
+        <div class="flex-grow-1">
+          <div class="fw-bold">${item.product_name}</div>
+          <div class="input-group input-group-sm mt-1" style="width:110px;">
+            <button class="btn btn-outline-secondary btn-sm btn-decr" data-id="${item.product_id}">−</button>
+            <input class="form-control text-center" value="${item.quantity}" readonly>
+            <button class="btn btn-outline-secondary btn-sm btn-incr" data-id="${item.product_id}">+</button>
+          </div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold">${fmtRupiah(item.total_price)}</div>
+          <button class="btn btn-link btn-sm text-danger btn-remove" data-id="${item.product_id}">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      `;
+
+      // Event untuk tombol + di offcanvas
+      div.querySelector('.btn-incr').onclick = e => {
+        const pid = e.currentTarget.dataset.id;
+        adjustCartOnServer(pid, 'add');
+      };
+      // Event untuk tombol - di offcanvas
+      div.querySelector('.btn-decr').onclick = e => {
+        const pid = e.currentTarget.dataset.id;
+        adjustCartOnServer(pid, 'remove');
+      };
+      // Event untuk tombol hapus (removeAll)
+      div.querySelector('.btn-remove').onclick = e => {
+        const pid = e.currentTarget.dataset.id;
+        adjustCartOnServer(pid, 'removeAll');
+      };
+
+      cartItems.appendChild(div);
     });
 
-    minus.addEventListener('click', () => {
-      const val = parseInt(input.value) || 0;
-      if (val > 0) input.value = val - 1;
-    });
-  });
+    const tax = Math.round(subtotal * 0.10);
+    subtotalEl.textContent = fmtRupiah(subtotal);
+    taxEl.textContent      = fmtRupiah(tax);
+    totalEl.textContent    = fmtRupiah(subtotal + tax);
+  }
 
-  // Inisialisasi
-  sortBy = sortSelect?.value || 'date_desc';
+  function updateBadges(items) {
+    let totalQty = 0;
+    items.forEach(item => totalQty += parseInt(item.quantity));
+    cartBadges.forEach(b => b.textContent = totalQty);
+  }
+
+  function syncGridQtyInputs(items) {
+    const qtyMap = {};
+    items.forEach(item => {
+      qtyMap[item.product_id] = parseInt(item.quantity);
+    });
+    if (!grid) return;
+    grid.querySelectorAll('.product-card').forEach(card => {
+      const id    = card.dataset.id;
+      const input = card.querySelector('.qty-input');
+      input.value  = qtyMap[id] || 0;
+    });
+  }
+
+  // 4. AJAX Tambah/Kurangi/Hapus
+  function adjustCartOnServer(productId, action) {
+    const urlAdd    = 'add_to_cart.php';
+    const urlRemove = 'remove_from_cart.php';
+
+    if (action === 'add') {
+      // Ambil elemen kartu produk
+      const card  = document.querySelector(`.product-card[data-id="${productId}"]`);
+      if (!card) return;
+      const name  = card.querySelector('.card-title').firstChild.textContent.trim();
+      const price = +card.dataset.price;
+
+      const data = new URLSearchParams();
+      data.append('product_id', productId);
+      data.append('product_name', name);
+      data.append('unit_price', price);
+
+      fetch(urlAdd, {
+        method: 'POST',
+        body: data
+      })
+      .then(res => res.json())
+      .then(json => {
+        if (json.status === 'success') {
+          loadCartFromServer();
+        } else {
+          alert('Gagal menambah ke keranjang: ' + json.message);
+        }
+      })
+      .catch(err => console.error('Fetch add_to_cart error:', err));
+
+    } else if (action === 'remove') {
+      const data = new URLSearchParams();
+      data.append('product_id', productId);
+
+      fetch(urlRemove, {
+        method: 'POST',
+        body: data
+      })
+      .then(res => res.json())
+      .then(json => {
+        if (json.status === 'success') {
+          loadCartFromServer();
+        } else {
+          console.error('Error remove:', json.message);
+        }
+      })
+      .catch(err => console.error('Fetch remove_from_cart error:', err));
+
+    } else if (action === 'removeAll') {
+      // Menghapus semua quantity: kirim remove berulang kali
+      function loopDelete() {
+        const data2 = new URLSearchParams();
+        data2.append('product_id', productId);
+        fetch(urlRemove, {
+          method: 'POST',
+          body: data2
+        })
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'success') {
+            loadCartFromServer();
+            loopDelete(); // ulangi hingga tidak ada baris
+          } else {
+            loadCartFromServer();
+          }
+        })
+        .catch(err => console.error('Fetch removeAll error:', err));
+      }
+      loopDelete();
+    }
+  }
+
+  // 5. PASANG EVENT LISTENER “+” / “−” DI GRID
+  function attachGridListeners() {
+    if (!grid) return;
+    grid.querySelectorAll('.product-card').forEach(card => {
+      const id    = card.dataset.id;
+      const plus  = card.querySelector('.btn-plus');
+      const minus = card.querySelector('.btn-minus');
+
+      plus.addEventListener('click', e => {
+        e.stopPropagation();
+        adjustCartOnServer(id, 'add');
+      });
+      minus.addEventListener('click', e => {
+        e.stopPropagation();
+        adjustCartOnServer(id, 'remove');
+      });
+    });
+  }
+
+  // 6. INISIALISASI AWAL
   applyFilters();
+  attachGridListeners();
+  loadCartFromServer();
 });

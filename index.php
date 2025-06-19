@@ -1,10 +1,23 @@
 <?php
+
+// Mulai atau lanjutkan session yang ada
+session_start();
+
+// Cek apakah 'user_id' ada di dalam session.
+// Jika tidak ada, artinya user belum login.
+if (!isset($_SESSION['user_id'])) {
+    // Arahkan (redirect) user kembali ke halaman login
+    header('Location: login.php?error=auth'); // 'auth' artinya butuh otentikasi
+    exit; // Pastikan script berhenti dieksekusi setelah redirect
+}
+
 // index.php
 require 'koneksi.php';
 
 // Ambil semua produk
 $stmt = $pdo->query("SELECT * FROM products WHERE id IN (1,2,3)");
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 
 
@@ -33,13 +46,13 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <ul class="navbar-nav">
           <li class="nav-item"><a class="nav-link" href="index.php">Beranda</a></li>
           <li class="nav-item"><a class="nav-link" href="menu.php">Menu</a></li>
-          <li class="nav-item"><a class="nav-link" href="about.html">Tentang Kami</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Kontak</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.php">Tentang Kami</a></li>
+          <li class="nav-item"><a class="nav-link" href="profil.php">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.php">Kontak</a></li>
         </ul>
       </div>
       <div class="ms-auto d-flex align-items-center gap-3">
-        <a class="nav-link p-0" href="#"><i class="bi bi-search fs-5"></i></a>
+        
         <a class="nav-link position-relative p-0" href="#">
           <i class="bi bi-cart3 fs-5"></i>
           <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">0</span>
@@ -90,70 +103,118 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <span class="visually-hidden">Next</span>
     </button>
   </div>
-  <!-- Menu Favorit -->
-  <section id="menu" class="py-5">
+ <section id="menu" class="py-5">
     <div class="container">
-      <h2 class="text-center mb-4">Menu Favorit Kami</h2>
-      <p class="text-center text-muted mb-5">
-        Temukan berbagai pilihan kopi premium dengan cita rasa khas
-      </p>
-      <div class="row g-4">
-        <?php foreach($products as $p): ?>
-        <div class="col-md-4">
-          <div class="card position-relative shadow-sm h-100">
-            <img src="<?=htmlspecialchars($p['image_url'])?>" class="card-img-top" alt="<?=htmlspecialchars($p['name'])?>">
-            <div class="detail-hover position-absolute top-0 end-0 m-2">
-              <button class="btn btn-sm btn-light border"
-                      data-bs-toggle="modal"
-                      data-bs-target="#modal<?=$p['id']?>">
-                Detail
-              </button>
-            </div>
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title"><?=htmlspecialchars($p['name'])?></h5>
-              <div class="mb-2">
-                <?php
-                  $full = floor($p['rating']);
-                  for($i=0;$i<$full;$i++) echo '<i class="bi bi-star-fill text-warning"></i>';
-                  if($p['rating'] - $full >= .5) echo '<i class="bi bi-star-half text-warning"></i>';
-                ?>
-              </div>
-              <p class="card-text text-muted"><?=htmlspecialchars($p['short_desc'])?></p>
-              <div class="mt-auto d-flex justify-content-between align-items-center">
-                <span class="fw-bold">Rp <?=number_format($p['price'],0,',','.')?></span>
-                <div class="qty-control d-flex">
-                  <button class="btn btn-outline-secondary btn-sm btn-decrement">−</button>
-                  <input type="text" class="form-control form-control-sm text-center mx-1" value="0" readonly>
-                  <button class="btn btn-outline-secondary btn-sm btn-increment">+</button>
+        <h2 class="text-center mb-4">Menu Favorit Kami</h2>
+        <p class="text-center text-muted mb-5">
+            Temukan berbagai pilihan kopi premium dengan cita rasa khas
+        </p>
+        <div class="row g-4">
+            
+            <?php foreach($products as $p): ?>
+            
+            <div class="col-md-4">
+                <div class="card position-relative shadow-sm h-100 product-card" 
+                     data-id="<?= $p['id'] ?>"
+                     data-name="<?= htmlspecialchars($p['name']) ?>"
+                     data-price="<?= $p['price'] ?>"
+                     data-image="<?= htmlspecialchars($p['image_url']) ?>"
+                     data-rating="<?= $p['rating'] ?>"
+                     data-date="<?= $p['created_at'] ?>">
+                    
+                    <img src="<?=htmlspecialchars($p['image_url'])?>" class="card-img-top" alt="<?=htmlspecialchars($p['name'])?>">
+                    <div class="detail-hover position-absolute top-0 end-0 m-2">
+                        <button class="btn btn-sm btn-light border"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modal<?=$p['id']?>">
+                            Detail
+                        </button>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title"><?=htmlspecialchars($p['name'])?></h5>
+                        <div class="mb-2">
+                            <span class="text-warning">
+                            <?php
+                                $full = floor($p['rating']);
+                                for($i=0; $i<$full; $i++) { echo '<i class="bi bi-star-fill"></i>'; }
+                                if($p['rating'] - $full >= .5) { echo '<i class="bi bi-star-half"></i>'; }
+                            ?>
+                            </span>
+                        </div>
+                        <p class="card-text text-muted small"><?=htmlspecialchars($p['short_desc'])?></p>
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <span class="fw-bold fs-5">Rp <?=number_format($p['price'],0,',','.')?></span>
+                            
+                            <div class="input-group input-group-sm qty-group" style="width: 120px;">
+                                <button class="btn btn-outline-secondary btn-minus">−</button>
+                                <input type="text" class="form-control qty-input text-center" value="0" readonly>
+                                <button class="btn btn-outline-secondary btn-plus">+</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Modal Dinamis -->
-        <div class="modal fade" id="modal<?=$p['id']?>" tabindex="-1" aria-labelledby="modalLabel<?=$p['id']?>" aria-hidden="true">
-          <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header bg-brown text-white">
-                <h5 class="modal-title" id="modalLabel<?=$p['id']?>">Detail Produk</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body">
-                <img src="<?=htmlspecialchars($p['image_url'])?>" class="img-fluid rounded mb-4" alt="">
-                <h5 class="mb-3"><?=htmlspecialchars($p['name'])?></h5>
-                <p class="text-muted mb-4"><?=htmlspecialchars($p['modal_desc'])?></p>
-                <p><strong>Asal Biji:</strong> <?=htmlspecialchars($p['origin'])?></p>
-                <p><strong>Intensitas:</strong> <?=htmlspecialchars($p['intensity'])?></p>
-                <p><strong>Level Roasting:</strong> <?=htmlspecialchars($p['roast_level'])?></p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <?php endforeach; ?>
-      </div>
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+    <div class="offcanvas-header bg-brown text-white">
+        <h5 id="cartOffcanvasLabel">Keranjang Belanja</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-  </section>
+    <div class="offcanvas-body d-flex flex-column">
+        
+        <div id="cartItems" class="mb-3 flex-grow-1 overflow-auto">
+            <p class="text-center text-muted mt-4">Keranjang Anda kosong.</p>
+        </div>
+        
+        <hr class="my-3" />
+        
+        <div class="totals-summary">
+            <ul class="list-unstyled mb-3">
+                <li class="d-flex justify-content-between text-muted">
+                    <span>Subtotal</span>
+                    <strong id="subtotalText">Rp 0</strong>
+                </li>
+                <li class="d-flex justify-content-between text-muted">
+                    <span>Pajak (11%)</span>
+                    <strong id="taxText">Rp 0</strong>
+                </li>
+                <li class="d-flex justify-content-between fs-5 fw-bold mt-2">
+                    <span>Total</span>
+                    <strong id="totalText">Rp 0</strong>
+                </li>
+            </ul>
+        </div>
+        
+        <a href="payment.php" class="btn btn-brown btn-lg w-100 mt-auto">
+            Lanjut ke Pembayaran
+        </a>
+        
+    </div>
+</div>
+
+            <div class="modal fade" id="modal<?=$p['id']?>" tabindex="-1" aria-labelledby="modalLabel<?=$p['id']?>" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-brown text-white">
+                            <h5 class="modal-title" id="modalLabel<?=$p['id']?>">Detail Produk</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="<?=htmlspecialchars($p['image_url'])?>" class="img-fluid rounded mb-4" alt="<?=htmlspecialchars($p['name'])?>">
+                            <h5 class="mb-3"><?=htmlspecialchars($p['name'])?></h5>
+                            <p class="text-muted mb-4"><?=htmlspecialchars($p['modal_desc'] ?? $p['short_desc'])?></p>
+                            <p><strong>Asal Biji:</strong> <?=htmlspecialchars($p['origin'] ?? 'N/A')?></p>
+                            <p><strong>Intensitas:</strong> <?=htmlspecialchars($p['intensity'] ?? 'N/A')?></p>
+                            <p><strong>Level Roasting:</strong> <?=htmlspecialchars($p['roast_level'] ?? 'N/A')?></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <?php endforeach; ?> 
+            
+        </div>
+    </div>
+</section>
 
  <!-- About -->
   <section id="about" class="py-5 bg-light">
@@ -237,9 +298,9 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <h5 class="fw-bold">Menu Cepat</h5>
           <ul class="list-unstyled small">
             <li><a href="menu.php" class="text-white text-decoration-none">Menu</a></li>
-            <li><a href="about.html" class="text-white text-decoration-none">Tentang Kami</a></li>
-            <li><a href="#" class="text-white text-decoration-none">Profile</a></li>
-            <li><a href="#" class="text-white text-decoration-none">Karir</a></li>
+            <li><a href="about.php" class="text-white text-decoration-none">Tentang Kami</a></li>
+            <li><a href="profil.php" class="text-white text-decoration-none">Profile</a></li>
+            <li><a href="contact.php" class="text-white text-decoration-none">Kontak</a></li>
           </ul>
         </div>
         <div class="col-md-3 mb-4">
@@ -254,10 +315,20 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <hr class="border-light">
       <div class="text-center small">© 2025 Amorad Caffe. Hak Cipta Dilindungi.</div>
     </div>
-    <!-- Floating Cart -->
-    <a href="#" class="cart-float d-flex justify-content-center align-items-center">
+   <!-- Floating Cart -->
+    <a
+      href="#"
+      class="cart-float d-flex justify-content-center align-items-center position-fixed"
+      style="bottom:1rem; right:1rem; z-index:1050;"
+      data-bs-toggle="offcanvas"
+      data-bs-target="#cartOffcanvas"
+      aria-controls="cartOffcanvas"
+    >
       <i class="bi bi-cart3 fs-4 text-white"></i>
-      <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle">0</span>
+      <span
+        class="cart-badge badge bg-warning text-dark position-absolute top-0 start-100 translate-middle"
+        >0</span
+      >
     </a>
   </footer>
 

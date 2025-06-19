@@ -1,0 +1,41 @@
+
+      :where([class^="ri-"])::before {
+        content: "\f3c2";
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f9f9f9;
+      }
+      .sidebar {
+        background-color: #3c2415;
+        color: white;
+      }
+      .sidebar-item {
+        transition: all 0.3s ease;
+      }
+      .sidebar-item:hover,
+      .sidebar-item.active {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      .table-row:hover {
+        background-color: rgba(107, 66, 38, 0.05);
+      }
+      .status-tersedia {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: rgb(16, 185, 129);
+      }
+      .status-hampir-habis {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: rgb(245, 158, 11);
+      }
+      .status-habis {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: rgb(239, 68, 68);
+      }
+      .toggle-switch input:checked + .toggle-slider {
+        background-color: #6b4226;
+      }
+      .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(18px);
+      }
+    

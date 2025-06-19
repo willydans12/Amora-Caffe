@@ -165,5 +165,34 @@ a {
   border-radius: 0.5rem;
 }
 
+ .bg-brown {
+      background-color: #5A3E36 !important;
+    }
+    .btn-outline-brown {
+      border-color: #5A3E36;
+      color: #5A3E36;
+    }
+    .btn-outline-brown:hover {
+      background-color: #5A3E36;
+      color: #fff;
+    }
+    /* scroll area for cart items */
+    #cartItems {
+      max-height: 60vh;
+    }
+
+    
+  /* Tombol solid cokelat */
+  .btn-brown {
+    background-color: #5A3E36 !important;
+    color: #fff !important;
+    border: 1px solid #5A3E36 !important;
+  }
+  .btn-brown:hover {
+    background-color: #4a3029 !important;
+    color: #fff !important;
+  }
+
+
 
 
